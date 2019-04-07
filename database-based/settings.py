@@ -1,6 +1,0 @@
-host = ''
-user = ''
-password = ''
-database = ''
-apikey = '57byQin2TjXUeCi1iAj0GcMF'
-secretkey = '5CjTgAsRmVppfxbjkznrVPeVPE2tjcGe'
