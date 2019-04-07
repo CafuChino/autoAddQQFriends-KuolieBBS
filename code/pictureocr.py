@@ -4,9 +4,16 @@ from selenium import webdriver
 import re
 import urllib.request
 import win_unicode_console
+import requests
 win_unicode_console.enable()
-
-accessUrl = 'https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=24.33b96da892b4737f29810c26a10c7786.2592000.1557210490.282335-15698863'
+apikey = '57byQin2TjXUeCi1iAj0GcMF'
+secretkey = '5CjTgAsRmVppfxbjkznrVPeVPE2tjcGe'
+get_token = requests.get(
+    'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s'
+    % (apikey, secretkey)).text
+token = json.loads(get_token)['access_token']
+accessUrl = 'https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=%s' % (
+    token)
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--headless')
@@ -17,7 +24,7 @@ chrome_options.add_argument(
     'user-agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 2_1 like Mac OS X; ja-jp) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5F137 Safari/525.20"'
 )
 driver = webdriver.Chrome(
-    executable_path='chromedriver.exe', chrome_options=chrome_options)
+    executable_path='chromedriver.exe', options=chrome_options)
 start = open('url.ini', encoding='utf-8').readlines()
 for line in start:
     line = line.replace('\n', '')
@@ -33,8 +40,7 @@ for line in start:
         url = picture.get_attribute('src')
         print(url)
         values = {
-            'access_token':
-            '24.33b96da892b4737f29810c26a10c7786.2592000.1557210490.282335-15698863',
+            'access_token': token,
             'url': '%s' % (url),
             'probability': 'true'
         }
@@ -73,8 +79,7 @@ for line in start:
             print("发现图片资源！地址：%s" % (url2))
             print("----开始分析图片%s----" % (url2))
             values = {
-                'access_token':
-                '24.33b96da892b4737f29810c26a10c7786.2592000.1557210490.282335-15698863',
+                'access_token': token,
                 'url': '%s' % (url2),
                 'probability': 'true'
             }
