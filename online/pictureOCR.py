@@ -1,24 +1,17 @@
 # coding:utf-8
-import urllib, base64
-import sys, json
-import ssl, pymysql
+import urllib
+import json
+import pymysql
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver import ActionChains
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.keys import Keys
 import time
 import re
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
 import urllib.request
 import win_unicode_console
+from settings import host, user, password, database, apikey, secretkey
 win_unicode_console.enable()
 
 
 def ocr():
-    db = pymysql.connect("58.87.124.5", "tieba", "Xiangni365", "tieba")
-    cursor = db.cursor()
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
@@ -27,22 +20,22 @@ def ocr():
     chrome_options.add_argument(
         'user-agent="Mozilla/5.0 (iPod; U; CPU iPhone OS 2_1 like Mac OS X; ja-jp) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5F137 Safari/525.20"'
     )
-    #driver = webdriver.PhantomJS(executable_path="phantomjs.exe")
-    driver = webdriver.Chrome(
-        executable_path='chromedriver.exe', chrome_options=chrome_options)
-    # host = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=57byQin2TjXUeCi1iAj0GcMF&client_secret=5CjTgAsRmVppfxbjkznrVPeVPE2tjcGe'
-    # request = urllib.request.Request(host)
-    # request.add_header('Content-Type', 'application/json; charset=UTF-8')
-    # response = urllib.request.urlopen(request)
-    # content = response.read()
-    # if (content):
-    #     token = json.loads(content)["access_token"]
-    #     remain = json.loads(content)["expires_in"]
-    #     print("已经获取到token，为%s,剩余可用期限为%.1f天。" % (token, remain / 86400))
-    accessUrl = 'https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=24.26b764bc2743fa4489acd9950812ca65.2592000.1554533447.282335-15698863'
+    driver = webdriver.Chrome(executable_path='chromedriver.exe', chrome_options=chrome_options)
+    requesthost = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s' % (
+        apikey, secretkey)
+    request = urllib.request.Request(requesthost)
+    request.add_header('Content-Type', 'application/json; charset=UTF-8')
+    response = urllib.request.urlopen(request)
+    content = response.read()
+    if (content):
+        token = json.loads(content)["access_token"]
+        remain = json.loads(content)["expires_in"]
+        print("已经获取到token，为%s,剩余可用期限为%.1f天。" % (token, remain / 86400))
+    accessUrl = 'https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=%s' % (
+        token)
     user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'
     # print(accessUrl)
-    db = pymysql.connect("58.87.124.5", "tieba", "Xiangni365", "tieba")
+    db = pymysql.connect(host, user, password, database)
     cursor = db.cursor()
     sql = "SELECT URL FROM kuolie"
     cursor.execute(sql)
@@ -70,8 +63,7 @@ def ocr():
                 url = picture[v].get_attribute('src')
                 print("----开始分析图片%s----" % (url))
                 values = {
-                    'access_token':
-                    '24.26b764bc2743fa4489acd9950812ca65.2592000.1554533447.282335-15698863',
+                    'access_token': token,
                     'url': '%s' % (url),
                     'probability': 'true'
                 }
@@ -180,3 +172,4 @@ def ocr():
     # content = response.read()
     # if (content):
     #     print(content)
+ocr()
