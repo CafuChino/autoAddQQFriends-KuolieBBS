@@ -4,7 +4,7 @@ import time
 
 
 def hell():
-    qq = open('qq.ini').readline()
+    qq = open('qq.ini', 'a+').readline()
     qq = qq.split(' ')
     amount = len(qq)
     print("数据库中有%d个qq号" % (amount))
@@ -28,10 +28,8 @@ def hell():
     while i < amount:
         webbrowser.open(
             "tencent://AddContact/?fromId=1&fromSubId=1&subcmd=all&uin=%s&fuin=%s&website=www.oicqzone.com"
-            % (qq[i],fuin))
+            % (qq[i], fuin))
         time.sleep(int(sleep))
         i = i + 1
     input('程序结束！可以关闭程序了')
     print("程序退出")
-
-hell()
